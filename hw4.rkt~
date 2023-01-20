@@ -12,11 +12,10 @@
 ;; it the same. Your task is then to build a function that ensures that two different
 ;; stack-based programs are equivalent. This will be your "verifier" for optimizations.
 
-;; part p1a
 (define-struct push [num] #:transparent)
-(define-struct add [] #:transparent)
-(define-struct mul [] #:transparent)
-(define-struct sub [] #:transparent)
+(define-struct add [])
+(define-struct mul [])
+(define-struct sub [])
 ; A SimpleInstr is one of:
 ; - (make-push Number)
 ; - (make-add)
@@ -43,15 +42,10 @@
                   [(push? i) (simple-eval (cons (push-num i) stk) instrs)]))]
     (cond [(empty? instrs) stk]
           [(cons? instrs) (eval-instr (first instrs) stk (rest instrs))])))
-;; part p1a
 
-;; part p1b
 ; simple-stack-verify : [List-of SimpleInstr] [List-of SimpleInstr] -> Boolean
 (define (simple-stack-verify p1 p2)
   ...)
-
-;; part p1b
-
 
 ;; Problem 2
 ;;
@@ -65,12 +59,9 @@
 ;; should turn into (make-push n) (make-push (+ m o)) (make-add)
 ;; rather than (make-push (+ n (+ m o))
 
-;; part p2
-; simple-const-fold: [List-of SimpleInstr] -> [List-of SimpleInstr]
+; simple-const-fold : [List-of SimpleInstr] -> [List-of SimpleInstr]
 (define (simple-const-fold p)
   ...)
-
-;; part p2
 
 ;; Problem 3
 ;;
@@ -78,47 +69,30 @@
 ;; verify using property based testing (PBT). To do this, your first task is to define
 ;; a generator for SimpleInstr
 
-;; part p3a
-
 ; choose-simple-instr : [Generator SimpleInstr]
 (define choose-simple-instr ...)
                                        
-;; part p3a
 
 ;; Now, you can use this to define a property that generates a [List-of SimpleInstr] (which can
 ;; use the `sized` and `choose-list` helpers from the quickcheck library), calls
 ;; `simple-const-fold` on it, and uses `simple-stack-verify` to check that the result still behaves
 ;; the same.
 
-;; part p3a
-
-;; part p3b
-
 (quickcheck (property [...] ...))
-
-;; part p3b
 
 ;; Problem 4
 ;;
 ;; To gain more confidence that your optimization is correct, define a symbolic version of an
 ;; instruction, `symbolic-instr`, using `choose*` to choose between different possibilies.
 
-;; part p4a
-
 ; symbolic-simpl-instr : -> [Symbolic SimpleInstr]
 (define (symbolic-simple-instr) ...)
-
-;; part p4a
 
 ;; Now, define a list (`symbolic-simpl-prog`) that contains up to 6 `symbolic-simpl-instr`.
 ;; Think about how to construct a list: you may need another symbolic value to control the length.
 
-;; part p4b
-
 ; symbolic-simple-prog : [Symbolic [List-of SimpleInstr]]
 (define symbolic-simple-prog ...)
-
-;; part p4b
 
 ;; Finally, you can now run `simple-const-fold` on this and `verify` that `simple-stack-verify`
 ;; returns true when passed the two inputs. This will have Rosette verify that for _all_ instruction
@@ -127,11 +101,7 @@
 ;; Note: Rosette should print (unsat ...) if it was unable to find a
 ;; counter-example, which is what we want!
 
-;; part p4c
-
 (verify (assert ...))
-
-;; part p4c
 
 ;; Problem 5
 ;;
@@ -143,7 +113,6 @@
 ;; to a stack and program (list of instructions), a list of variable bindings (or substitution)
 ;; (mappings from 'names' to numbers).
 
-;; part p5a
 (define-struct var [name] #:transparent)
 ; An Instr is one of:
 ; - (make-push Number)
@@ -192,17 +161,13 @@
                   [(var? i) (lookup-var (var-name i) env stk instrs)]))]
     (cond [(empty? instrs) stk]
           [(cons? instrs) (eval-instr (first instrs) stk (rest instrs))])))
-;; part p5a
 
 ;; Your first task is to first define an updated version of `simple-stack-verify`.
 ;; This time it will take a substitution (set of variable bindings) that it
 ;; can pass to `eval`.
 
-;; part p5b
 ; stack-verify : [List-of Binding] [List-of Instr] [List-of Instr] -> Boolean
 (define (stack-verify env p1 p2) ...)
-
-;; part p5b
 
 ;; Next, define an updated version of `simple-const-fold` that does
 ;; more sophisticated constant folding: collapsing any sequence of arithmetic operations that
@@ -210,32 +175,24 @@
 ;; Note: We still don't want to worry about folding that only becomes
 ;; obvious after an earlier round. 
 
-;; part p5c
 ; const-fold : [List-of Instr] -> [List-of Instr]
 (define (const-fold p) ...)
-;; part p5c
+
 
 ;; Third, define a generator for `Instr`:
 
-;; part p5d
 ; choose-instr : [Generator Instr]
 (define choose-instr ...)
 
-;; part p5d
-
 ;; And a generator for variable bindings:
 
-;; part p5e
 ; choose-bind : [Generator Binding]
 (define choose-bind ...)
-;; part p5e
 
 ;; And run similar PBT testing via quickcheck of your new `const-fold`:
 
-;; part p5f
 (quickcheck (property [...] ...))
 
-;; part p5f
 
 ;; Fourth, a symbolic `Instr`, a symbolic Program of up to 4 instructions,
 ;; and an environment of up to 2 bindings.
@@ -243,9 +200,9 @@
 ;; how you implement things, might increase quite a bit, if these are
 ;; much larger. 
 
-;; part p5g
 ; symbolic-instr : [Symbolic Instr]
 (define (symbolic-instr) ...)
+
 
 ; symbolic-prog : [Symbolic [List-of Instr]]
 (define symbolic-prog ...)
@@ -255,14 +212,11 @@
 
 ; symbolic-env : [Symbolic [List-of [Symbolic Binding]]]
 (define symbolic-env ...)
-
-;; part p5g
+                                 
 
 ;; A finally, again `verify` that applying `const-fold` to your `symbolic-prog` results in
 ;; a program that is equal according to `stack-verify`, being sure to
 ;; pass in the symbolic env to `stack-verify`.
 
-;; part p5h
 (verify (assert ...))
-;; part p5h
 
